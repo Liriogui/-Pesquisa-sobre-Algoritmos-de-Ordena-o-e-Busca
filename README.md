@@ -35,7 +35,7 @@ Este trabalho consiste na implementação de algoritmos de ordenação e busca e
 ### **Compilação**  
 1. Clone o repositório:  
    ```bash
-   git clone https://github.com/seu-usuario/Trabalho02-Ordenacao-Busca.git
+   git clone https://github.com/Liriogui/Trabalho02-Ordenacao-Busca.git
 
 
 ###   **REFERÊNCIAS** 
