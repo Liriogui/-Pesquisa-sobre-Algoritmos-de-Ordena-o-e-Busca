@@ -36,3 +36,12 @@ Este trabalho consiste na implementação de algoritmos de ordenação e busca e
 1. Clone o repositório:  
    ```bash
    git clone https://github.com/seu-usuario/Trabalho02-Ordenacao-Busca.git
+
+
+###   **REFERÊNCIAS** 
+
+CORMEN, T. H. et al. Introduction to Algorithms. MIT Press, 2009.
+
+KNUTH, D. E. The Art of Computer Programming. Volume 3, 1997.
+
+SEDGEWICK, R. Algorithms in C. Addison-Wesley, 1997.
