@@ -1,8 +1,7 @@
 # Trabalho 02 - Ordenação e Busca  
 **Disciplina**: Estrutura de Dados I (DCC 302)  
 **Professor**: Filipe Dwan Pereira  
-**Aluno**: Guilherme Lirioberto da Silva Alves 
-**Data de Entrega**: 20/02/2025  
+**Aluno**: Guilherme Lirioberto da Silva Alves, 
 
 ---
 
