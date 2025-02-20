@@ -1,0 +1,61 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include "ordenacao.h"
+#include "busca.h"
+#include "utils.h"
+
+void menu() {
+    printf("\n=== MENU ===\n");
+    printf("1 - Gerar arquivo com números aleatórios\n");
+    printf("2 - Ordenar arquivo\n");
+    printf("3 - Buscar valor em arquivo ordenado\n");
+    printf("0 - Sair\n");
+    printf("Escolha uma opção: ");
+}
+
+int main() {
+    int opcao;
+    char nomeArquivo[100];
+    int tamanho;
+
+    do {
+        menu();
+        scanf("%d", &opcao);
+
+        switch (opcao) {
+            case 1:
+                printf("Digite o tamanho do arquivo (100, 1000, 10000, 100000): ");
+                scanf("%d", &tamanho);
+                sprintf(nomeArquivo, "dados/dados_%d.txt", tamanho);
+                gerarArquivo(nomeArquivo, tamanho);
+                printf("Arquivo gerado com sucesso: %s\n", nomeArquivo);
+                break;
+
+            case 2:
+                printf("Digite o nome do arquivo a ser ordenado (ex: dados/dados_100.txt): ");
+                scanf("%s", nomeArquivo);
+                ordenarArquivo(nomeArquivo);
+                break;
+
+            case 3:
+                printf("Digite o nome do arquivo ordenado (ex: resultados/ordenado_100_quick.txt): ");
+                scanf("%s", nomeArquivo);
+                int valor;
+                printf("Digite o valor a ser buscado: ");
+                scanf("%d", &valor);
+                buscarValor(nomeArquivo, valor);
+                break;
+
+            case 0:
+                printf("Saindo...\n");
+                break;
+
+            default:
+                printf("Opção inválida!\n");
+                break;
+        }
+    } while (opcao != 0);
+
+    return 0;
+}
