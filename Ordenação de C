@@ -1,0 +1,79 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include "ordenacao.h"
+
+void bubbleSort(int arr[], int n, int *comparacoes, int *trocas) {
+    for (int i = 0; i < n-1; i++) {
+        for (int j = 0; j < n-i-1; j++) {
+            (*comparacoes)++;
+            if (arr[j] > arr[j+1]) {
+                troca(&arr[j], &arr[j+1]);
+                (*trocas)++;
+            }
+        }
+    }
+}
+
+void quickSort(int arr[], int low, int high, int *comparacoes, int *trocas) {
+    if (low < high) {
+        int pi = partition(arr, low, high, comparacoes, trocas);
+        quickSort(arr, low, pi-1, comparacoes, trocas);
+        quickSort(arr, pi+1, high, comparacoes, trocas);
+    }
+}
+
+int partition(int arr[], int low, int high, int *comparacoes, int *trocas) {
+    int pivot = arr[high];
+    int i = (low - 1);
+
+    for (int j = low; j <= high-1; j++) {
+        (*comparacoes)++;
+        if (arr[j] < pivot) {
+            i++;
+            troca(&arr[i], &arr[j]);
+            (*trocas)++;
+        }
+    }
+    troca(&arr[i+1], &arr[high]);
+    (*trocas)++;
+    return (i + 1);
+}
+
+void ordenarArquivo(const char *nomeArquivo) {
+    FILE *arquivo = fopen(nomeArquivo, "r");
+    if (!arquivo) {
+        printf("Erro ao abrir o arquivo!\n");
+        return;
+    }
+
+    int n = 0, valor;
+    while (fscanf(arquivo, "%d", &valor) != EOF) n++;
+    rewind(arquivo);
+
+    int *arr = (int *)malloc(n * sizeof(int));
+    for (int i = 0; i < n; i++) fscanf(arquivo, "%d", &arr[i]);
+    fclose(arquivo);
+
+    int comparacoes = 0, trocas = 0;
+    clock_t inicio = clock();
+    quickSort(arr, 0, n-1, &comparacoes, &trocas);
+    clock_t fim = clock();
+    double tempo = (double)(fim - inicio) / CLOCKS_PER_SEC;
+
+    char nomeSaida[100];
+    sprintf(nomeSaida, "resultados/ordenado_%d_quick.txt", n);
+    FILE *saida = fopen(nomeSaida, "w");
+    for (int i = 0; i < n; i++) fprintf(saida, "%d\n", arr[i]);
+    fclose(saida);
+
+    printf("\n=== ORDENAÇÃO CONCLUÍDA ===\n");
+    printf("ALGORITMO: Quick Sort\n");
+    printf("TAMANHO: %d\n", n);
+    printf("COMPARAÇÕES: %d\n", comparacoes);
+    printf("TROCAS: %d\n", trocas);
+    printf("TEMPO: %.4f s\n", tempo);
+    printf("ARQUIVO SALVO: %s\n", nomeSaida);
+
+    free(arr);
+}
