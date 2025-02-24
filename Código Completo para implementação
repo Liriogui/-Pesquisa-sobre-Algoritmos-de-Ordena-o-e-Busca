@@ -1,0 +1,216 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+// Função para trocar dois elementos
+void troca(int *a, int *b) {
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+// Função para gerar arquivo com números aleatórios
+void gerarArquivo(const char *nomeArquivo, int tamanho) {
+    FILE *arquivo = fopen(nomeArquivo, "w");
+    if (!arquivo) {
+        printf("Erro ao criar o arquivo!\n");
+        return;
+    }
+    srand(time(NULL));
+    for (int i = 0; i < tamanho; i++) {
+        fprintf(arquivo, "%d\n", rand() % 100000);
+    }
+    fclose(arquivo);
+    printf("Arquivo gerado com sucesso: %s\n", nomeArquivo);
+}
+
+// Bubble Sort
+void bubbleSort(int arr[], int n, int *comparacoes, int *trocas) {
+    for (int i = 0; i < n-1; i++) {
+        for (int j = 0; j < n-i-1; j++) {
+            (*comparacoes)++;
+            if (arr[j] > arr[j+1]) {
+                troca(&arr[j], &arr[j+1]);
+                (*trocas)++;
+            }
+        }
+    }
+}
+
+// Quick Sort
+int partition(int arr[], int low, int high, int *comparacoes, int *trocas) {
+    int pivot = arr[high];
+    int i = (low - 1);
+
+    for (int j = low; j <= high-1; j++) {
+        (*comparacoes)++;
+        if (arr[j] < pivot) {
+            i++;
+            troca(&arr[i], &arr[j]);
+            (*trocas)++;
+        }
+    }
+    troca(&arr[i+1], &arr[high]);
+    (*trocas)++;
+    return (i + 1);
+}
+
+void quickSort(int arr[], int low, int high, int *comparacoes, int *trocas) {
+    if (low < high) {
+        int pi = partition(arr, low, high, comparacoes, trocas);
+        quickSort(arr, low, pi-1, comparacoes, trocas);
+        quickSort(arr, pi+1, high, comparacoes, trocas);
+    }
+}
+
+// Busca Sequencial
+int buscaSequencial(int arr[], int n, int valor, int *comparacoes) {
+    for (int i = 0; i < n; i++) {
+        (*comparacoes)++;
+        if (arr[i] == valor) return i;
+    }
+    return -1;
+}
+
+// Busca Binária
+int buscaBinaria(int arr[], int esq, int dir, int valor, int *comparacoes) {
+    while (esq <= dir) {
+        int meio = esq + (dir - esq) / 2;
+        (*comparacoes)++;
+        if (arr[meio] == valor) return meio;
+        if (arr[meio] < valor) esq = meio + 1;
+        else dir = meio - 1;
+    }
+    return -1;
+}
+
+// Função para ordenar arquivo e medir desempenho
+void ordenarArquivo(const char *nomeArquivo) {
+    FILE *arquivo = fopen(nomeArquivo, "r");
+    if (!arquivo) {
+        printf("Erro ao abrir o arquivo!\n");
+        return;
+    }
+
+    // Contar o número de elementos no arquivo
+    int n = 0, valor;
+    while (fscanf(arquivo, "%d", &valor) != EOF) n++;
+    rewind(arquivo);
+
+    // Ler os dados do arquivo
+    int *arr = (int *)malloc(n * sizeof(int));
+    for (int i = 0; i < n; i++) fscanf(arquivo, "%d", &arr[i]);
+    fclose(arquivo);
+
+    // Medir desempenho do Quick Sort
+    int comparacoes = 0, trocas = 0;
+    clock_t inicio = clock();
+    quickSort(arr, 0, n-1, &comparacoes, &trocas);
+    clock_t fim = clock();
+    double tempo = (double)(fim - inicio) / CLOCKS_PER_SEC;
+
+    // Salvar arquivo ordenado
+    char nomeSaida[100];
+    sprintf(nomeSaida, "ordenado_%d_quick.txt", n);
+    FILE *saida = fopen(nomeSaida, "w");
+    for (int i = 0; i < n; i++) fprintf(saida, "%d\n", arr[i]);
+    fclose(saida);
+
+    // Exibir resultados
+    printf("\n=== ORDENAÇÃO CONCLUÍDA ===\n");
+    printf("ALGORITMO: Quick Sort\n");
+    printf("TAMANHO: %d\n", n);
+    printf("COMPARAÇÕES: %d\n", comparacoes);
+    printf("TROCAS: %d\n", trocas);
+    printf("TEMPO: %.4f s\n", tempo);
+    printf("ARQUIVO SALVO: %s\n", nomeSaida);
+
+    free(arr);
+}
+
+// Função para buscar valor em arquivo ordenado
+void buscarValor(const char *nomeArquivo, int valor) {
+    FILE *arquivo = fopen(nomeArquivo, "r");
+    if (!arquivo) {
+        printf("Erro ao abrir o arquivo!\n");
+        return;
+    }
+
+    // Contar o número de elementos no arquivo
+    int n = 0, num;
+    while (fscanf(arquivo, "%d", &num) != EOF) n++;
+    rewind(arquivo);
+
+    // Ler os dados do arquivo
+    int *arr = (int *)malloc(n * sizeof(int));
+    for (int i = 0; i < n; i++) fscanf(arquivo, "%d", &arr[i]);
+    fclose(arquivo);
+
+    // Realizar busca binária
+    int comparacoes = 0;
+    int indice = buscaBinaria(arr, 0, n-1, valor, &comparacoes);
+
+    // Exibir resultados da busca
+    if (indice != -1) {
+        printf("Valor %d encontrado na posição %d.\n", valor, indice);
+    } else {
+        printf("Valor %d não encontrado.\n", valor);
+    }
+    printf("Comparações realizadas: %d\n", comparacoes);
+
+    free(arr);
+}
+
+// Menu interativo
+void menu() {
+    printf("\n=== MENU ===\n");
+    printf("1 - Gerar arquivo com números aleatórios\n");
+    printf("2 - Ordenar arquivo\n");
+    printf("3 - Buscar valor em arquivo ordenado\n");
+    printf("0 - Sair\n");
+    printf("Escolha uma opção: ");
+}
+
+int main() {
+    int opcao;
+    char nomeArquivo[100];
+    int tamanho, valor;
+
+    do {
+        menu();
+        scanf("%d", &opcao);
+
+        switch (opcao) {
+            case 1:
+                printf("Digite o tamanho do arquivo (100, 1000, 10000, 100000): ");
+                scanf("%d", &tamanho);
+                sprintf(nomeArquivo, "dados_%d.txt", tamanho);
+                gerarArquivo(nomeArquivo, tamanho);
+                break;
+
+            case 2:
+                printf("Digite o nome do arquivo a ser ordenado (ex: dados_100.txt): ");
+                scanf("%s", nomeArquivo);
+                ordenarArquivo(nomeArquivo);
+                break;
+
+            case 3:
+                printf("Digite o nome do arquivo ordenado (ex: ordenado_100_quick.txt): ");
+                scanf("%s", nomeArquivo);
+                printf("Digite o valor a ser buscado: ");
+                scanf("%d", &valor);
+                buscarValor(nomeArquivo, valor);
+                break;
+
+            case 0:
+                printf("Saindo...\n");
+                break;
+
+            default:
+                printf("Opção inválida!\n");
+                break;
+        }
+    } while (opcao != 0);
+
+    return 0;
+}
